@@ -1,21 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="description" content="BGM Editorial Theater">
-    <title>BGM Editorial Theater</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div id="bgm-shell" class="shell gpu-layer">
-      <header id="top-bar" class="glass-panel gpu-layer">
-        <p id="brand-label" class="brand-eyebrow">Breaking Ground Media</p>
-        <h1 id="route-title">Editorial Theater</h1>
-      </header>
-      <main id="app" class="route-shell gpu-layer" aria-live="polite"></main>
-      <nav id="bottom-nav" class="bottom-nav glass-panel gpu-layer" aria-label="Primary Navigation"></nav>
-    </div>
-    <script type="module" src="main.js"></script>
-  </body>
+    <title>BGM | Breaking Ground</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+
+    <main id="app">
+        <div style="height: 100vh; display: grid; place-items: center; color: #444;">
+            Loading Experience...
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    </script>
+</body>
 </html>

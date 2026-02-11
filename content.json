@@ -1,315 +1,110 @@
 {
-  "meta": {
-    "siteName": "Breaking Ground Media",
-    "version": "1.1.0",
-    "generatedAt": "2026-02-11T00:00:00.000Z",
-    "defaultRoute": "home"
+  "site": {
+    "name": "Breaking Ground",
+    "logo": "BGM",
+    "description": "Cinematic journalism for the modern era."
   },
-  "navigation": {
-    "primary": [
-      {
-        "id": "home",
-        "label": "Home",
-        "href": "#home",
-        "icon": "grid"
-      },
-      {
-        "id": "latest",
-        "label": "Latest",
-        "href": "#latest",
-        "icon": "bolt"
-      },
-       {
-        "id": "watch",
-        "label": "Watch",
-        "href": "#watch",
-        "icon": "play"
-      }
-    ]
+  "featured": {
+    "headline": "The Energy Pivot",
+    "subhead": "How the world is rewiring itself in real-time.",
+    "image": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=80",
+    "type": "Cinematic Article",
+    "linkId": "energy-pivot",
+    "videoBrief": "xJw6B7N9J6g"
   },
-  "home": {
-    "headline": "Top Stories",
-    "featured": [
-      "feature-neon-grid-power"
-    ],
-    "rails": [
-        {
-            "id": "rail-latest",
-            "title": "Latest Intelligence",
-            "type": "articles",
-            "items": [
-                "article-quantum-logistics",
-                "article-urban-mining",
-                "article-drone-corridors",
-                "article-synthetic-bio"
-            ]
-        },
-        {
-            "id": "rail-clips",
-            "title": "Quick Briefs",
-            "type": "clips",
-            "items": [
-                "clip-market-flash",
-                "clip-policy-alert",
-                "clip-tech-spotlight"
-            ]
-        },
-        {
-             "id": "rail-videos",
-             "title": "Documentaries",
-             "type": "videos",
-             "items": [
-                 "video-deep-sea",
-                 "video-space-junk"
-             ]
-        }
-    ]
-  },
-  "articles": [
+  "categories": [
     {
-      "id": "feature-neon-grid-power",
-      "slug": "neon-grid-power-playbook",
-      "title": "How City Grids Became a Strategic Theater",
-      "dek": "Inside the systems race to harden urban energy networks against AI-era disruption.",
-      "kicker": "Deep Dive",
-      "authors": [
-        "BGM Systems Desk"
-      ],
-      "publishedAt": "2026-02-10T16:00:00.000Z",
-      "updatedAt": "2026-02-11T09:00:00.000Z",
-      "readingMinutes": 7,
-      "tags": [
-        "infrastructure",
-        "risk",
-        "policy"
-      ],
-      "hero": {
-        "image": {
-          "src": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80",
-          "alt": "Night skyline with electric grid lines",
-          "width": 1920,
-          "height": 1080,
-          "loading": "eager"
-        },
-        "video": null
-      },
-      "widget_data": {
-        "sparkline_market_pressure": {
-          "label": "Load Pressure",
-          "points": [
-            31,
-            33,
-            30,
-            38,
-            41,
-            45
-          ],
-          "unit": "%",
-          "color": "#D4AF37"
-        },
-        "heat_risk_scale": {
-          "label": "Risk Escalation",
-          "riskScale": [
-            "Low",
-            "Guarded",
-            "Elevated",
-            "Critical"
-          ],
-          "currentIndex": 2
-        }
-      },
-      "widgets": [
+      "title": "Latest Stories",
+      "type": "standard",
+      "items": [
         {
-          "id": "widget-load-pressure",
-          "type": "sparkline",
-          "dataRef": "sparkline_market_pressure"
+          "id": "ai-journalism",
+          "title": "AI in the Newsroom",
+          "category": "Tech",
+          "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80"
         },
         {
-          "id": "widget-risk-heat",
-          "type": "heat",
-          "dataRef": "heat_risk_scale"
+          "id": "urban-future",
+          "title": "The 15-Minute City",
+          "category": "Urbanism",
+          "image": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=800&q=80"
+        },
+        {
+          "id": "ocean-cleanup",
+          "title": "Reclaiming the Deep",
+          "category": "Environment",
+          "image": "https://images.unsplash.com/photo-1484291470158-b8f8d608850d?auto=format&fit=crop&w=800&q=80"
         }
-      ],
+      ]
+    },
+    {
+      "title": "60 Seconds",
+      "type": "shorts",
+      "items": [
+        {
+          "id": "FTQbiNvZqaY",
+          "title": "Global Pulse",
+          "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600"
+        },
+        {
+          "id": "M7lc1UVf-VE",
+          "title": "Creator Econ",
+          "image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600"
+        },
+        {
+          "id": "ysz5S6PUM-U",
+          "title": "Future Work",
+          "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600"
+        }
+      ]
+    },
+    {
+      "title": "Live Data",
+      "type": "widgets",
+      "items": [
+        {
+          "title": "Inflation",
+          "type": "sparkline"
+        },
+        {
+          "title": "Heat Risk",
+          "type": "heat"
+        },
+        {
+          "title": "Adoption",
+          "type": "bar"
+        }
+      ]
+    }
+  ],
+  "articles": {
+    "energy-pivot": {
+      "title": "The Energy Pivot",
+      "hero": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=80",
       "blocks": [
         {
-          "type": "paragraph",
-          "text": "The next generation grid is now judged by resilience metrics, not just by uptime. In a world where AI workloads are doubling energy consumption every few months, the stability of urban power networks has become a national security priority."
+          "type": "text",
+          "content": "The transition isn't coming. It is here. In the last 12 months, grid storage capacity has doubled in three major continents."
         },
         {
-          "type": "heading",
-          "level": 2,
-          "text": "Operational Flashpoint"
+          "type": "infographic",
+          "variant": "bar",
+          "caption": "Global Storage Capacity (GW)"
         },
         {
-          "type": "widget",
-          "widgetRef": "widget-load-pressure"
+          "type": "text",
+          "content": "This exponential curve is what analysts missed. It is not linear growth; it is a fundamental rewriting of the infrastructure playbook."
         },
         {
-          "type": "paragraph",
-          "text": "Regional operators moved from static contingency plans to mission-based adaptation loops. We observed a 40% increase in autonomous switching events during the last heatwave, preventing widespread blackouts."
+          "type": "video",
+          "id": "xJw6B7N9J6g",
+          "caption": "Field Report: The Gigafactory"
         },
         {
-            "type": "image",
-            "src": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
-            "alt": "Technician working on server rack",
-            "caption": "New cooling systems are critical for high-density compute nodes."
-        },
-        {
-          "type": "heading",
-           "level": 2,
-           "text": "The Human Factor"
-        },
-        {
-          "type": "paragraph",
-          "text": "Despite automation, the 'human in the loop' remains the ultimate fail-safe. Training programs are being completely overhauled to focus on crisis management rather than routine maintenance."
-        },
-        {
-          "type": "widget",
-          "widgetRef": "widget-risk-heat"
+          "type": "text",
+          "content": "As we move into the next decade, the winners will be those who control the supply chain, not just the generation methods."
         }
-      ],
-      "seo": {
-        "description": "How system-level energy journalism can map risk in real time.",
-        "ogImage": "assets/og/grid-power-playbook.jpg"
-      }
-    },
-    {
-        "id": "article-quantum-logistics",
-        "title": "Quantum Logistics",
-        "dek": "Supply chains are getting a quantum upgrade.",
-        "kicker": "Tech",
-        "publishedAt": "2026-02-09T10:00:00.000Z",
-        "readingMinutes": 5,
-        "hero": {
-            "image": {
-                "src": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80",
-                "alt": "Abstract blue data flow"
-            }
-        },
-         "blocks": [
-            { "type": "paragraph", "text": "Quantum computing is solving the traveling salesman problem in real-time for global fleets." }
-        ]
-    },
-    {
-        "id": "article-urban-mining",
-        "title": "Urban Mining Returns",
-        "dek": "Extracting rare earth transitions from our own waste.",
-        "kicker": "Sustainability",
-        "publishedAt": "2026-02-08T14:30:00.000Z",
-        "readingMinutes": 4,
-         "hero": {
-            "image": {
-                "src": "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=800&q=80",
-                "alt": "Recycling facility detail"
-            }
-        },
-         "blocks": [
-            { "type": "paragraph", "text": "Old phones are the new gold mines. We verify the yields." }
-        ]
-    },
-    {
-         "id": "article-drone-corridors",
-         "title": "The Sky Highways",
-         "dek": "Mapping the invisible lanes above our heads.",
-         "kicker": "Transport",
-         "publishedAt": "2026-02-07T09:15:00.000Z",
-         "readingMinutes": 6,
-          "hero": {
-            "image": {
-                "src": "https://images.unsplash.com/photo-1473968512647-3cdd93309aeb?auto=format&fit=crop&w=800&q=80",
-                "alt": "Drone silhouette in city sky"
-            }
-        },
-          "blocks": [
-            { "type": "paragraph", "text": "Air traffic control for drones is finally here." }
-        ]
-    },
-    {
-        "id": "article-synthetic-bio",
-        "title": "Designing Life",
-        "dek": "Synthetic biology moves from lab to factory.",
-        "kicker": "Science",
-        "publishedAt": "2026-02-06T11:20:00.000Z",
-         "readingMinutes": 8,
-          "hero": {
-            "image": {
-                "src": "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=800&q=80",
-                "alt": "Lab glassware with fluids"
-            }
-        },
-         "blocks": [
-            { "type": "paragraph", "text": "Custom proteins are rewriting the rules of manufacturing." }
-        ]
-    },
-    {
-        "id": "clip-market-flash",
-        "title": "Market Flash: AI Chips",
-        "dek": "Stocks surge on new fab news.",
-        "kicker": "Market",
-         "readingMinutes": 1,
-         "hero": {
-            "image": {
-                "src": "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?auto=format&fit=crop&w=800&q=80",
-                "alt": "Stock chart on screen"
-            }
-        },
-        "blocks": [ { "type": "paragraph", "text": "Brief update on the semiconductor sector." } ]
-    },
-    {
-        "id": "clip-policy-alert",
-        "title": "Policy Alert: Data Privacy",
-        "dek": "New EU regulations effective today.",
-        "kicker": "Policy",
-        "readingMinutes": 2,
-        "hero": {
-             "image": {
-                "src": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=800&q=80",
-                "alt": "Gavel and documents"
-            }
-        },
-         "blocks": [ { "type": "paragraph", "text": "What you need to know about the new privacy shield." } ]
-    },
-     {
-        "id": "clip-tech-spotlight",
-        "title": "Gadget Watch: AR Glasses",
-        "dek": "Hands-on with the latest prototype.",
-        "kicker": "Gear",
-        "readingMinutes": 2,
-         "hero": {
-             "image": {
-                "src": "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&w=800&q=80",
-                "alt": "Person wearing VR headset"
-            }
-        },
-        "blocks": [ { "type": "paragraph", "text": "It is lighter than ever, but is the battery life enough?" } ]
-    },
-    {
-        "id": "video-deep-sea",
-        "title": "The Deepest Trench",
-        "dek": "Exploration at 11,000 meters.",
-        "kicker": "Doc",
-        "duration": "12:30",
-        "hero": {
-             "image": {
-                "src": "https://images.unsplash.com/photo-1682687220208-22d7a2543e88?auto=format&fit=crop&w=800&q=80",
-                "alt": "Underwater view"
-            }
-        },
-         "blocks": [ { "type": "paragraph", "text": "Video description placeholder." } ]
-    },
-    {
-         "id": "video-space-junk",
-         "title": "Cleaning Orbit",
-         "dek": "The mission to catch a satellite.",
-         "kicker": "Doc",
-         "duration": "08:45",
-         "hero": {
-             "image": {
-                "src": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=800&q=80",
-                "alt": "Earth from space"
-             }
-         },
-         "blocks": [ { "type": "paragraph", "text": "Video description placeholder." } ]
+      ]
     }
-  ]
+  }
 }
