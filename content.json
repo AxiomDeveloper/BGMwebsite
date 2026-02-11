@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "siteName": "Breaking Ground Media",
+    "version": "1.0.0",
+    "generatedAt": "2026-02-11T00:00:00.000Z",
+    "defaultRoute": "home"
+  },
+  "navigation": {
+    "primary": [
+      {
+        "id": "home",
+        "label": "Home",
+        "href": "#home",
+        "icon": "grid"
+      },
+      {
+        "id": "latest",
+        "label": "Latest",
+        "href": "#latest",
+        "icon": "bolt"
+      }
+    ]
+  },
+  "home": {
+    "headline": "Top Stories",
+    "featured": [
+      "feature-neon-grid-power"
+    ],
+    "feed": [
+      {
+        "articleId": "feature-neon-grid-power",
+        "priority": 1,
+        "layout": {
+          "colSpan": 2,
+          "rowSpan": 2,
+          "aspect": "16:9"
+        }
+      }
+    ]
+  },
+  "articles": [
+    {
+      "id": "feature-neon-grid-power",
+      "slug": "neon-grid-power-playbook",
+      "title": "How City Grids Became a Strategic Theater",
+      "dek": "Inside the systems race to harden urban energy networks against AI-era disruption.",
+      "kicker": "Featured",
+      "authors": [
+        "BGM Systems Desk"
+      ],
+      "publishedAt": "2026-02-10T16:00:00.000Z",
+      "updatedAt": "2026-02-11T09:00:00.000Z",
+      "readingMinutes": 7,
+      "tags": [
+        "infrastructure",
+        "risk",
+        "policy"
+      ],
+      "hero": {
+        "image": {
+          "src": "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1920&q=80",
+          "alt": "Night skyline with electric grid lines",
+          "width": 1920,
+          "height": 1080,
+          "loading": "lazy"
+        },
+        "video": null
+      },
+      "widget_data": {
+        "sparkline_market_pressure": {
+          "label": "Load Pressure",
+          "points": [
+            31,
+            33,
+            30,
+            38,
+            41,
+            45
+          ],
+          "unit": "%",
+          "color": "#D4AF37"
+        },
+        "heat_risk_scale": {
+          "label": "Risk Escalation",
+          "riskScale": [
+            "Low",
+            "Guarded",
+            "Elevated",
+            "Critical"
+          ],
+          "currentIndex": 2
+        }
+      },
+      "widgets": [
+        {
+          "id": "widget-load-pressure",
+          "type": "sparkline",
+          "dataRef": "sparkline_market_pressure"
+        },
+        {
+          "id": "widget-risk-heat",
+          "type": "heat",
+          "dataRef": "heat_risk_scale"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "The next generation grid is now judged by resilience metrics, not just by uptime."
+        },
+        {
+          "type": "heading",
+          "level": 2,
+          "text": "Operational Flashpoint"
+        },
+        {
+          "type": "widget",
+          "widgetRef": "widget-load-pressure"
+        },
+        {
+          "type": "paragraph",
+          "text": "Regional operators moved from static contingency plans to mission-based adaptation loops."
+        },
+        {
+          "type": "widget",
+          "widgetRef": "widget-risk-heat"
+        }
+      ],
+      "seo": {
+        "description": "How system-level energy journalism can map risk in real time.",
+        "ogImage": "assets/og/grid-power-playbook.jpg"
+      }
+    }
+  ]
+}
