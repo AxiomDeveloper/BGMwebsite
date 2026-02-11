@@ -2,8 +2,8 @@ const DEFAULT_OPTIONS = {
   contentUrl: "content.json",
   mountSelector: "#app",
   enableViewTransitions: true,
-  pollIntervalMs: 7000,
-  onRouteChange: () => {}
+  pollIntervalMs: 8000,
+  onRouteChange: () => { }
 };
 
 function escapeHTML(value) {
@@ -21,7 +21,7 @@ function formatDate(isoValue) {
     return "Unknown date";
   }
   return date.toLocaleDateString(undefined, {
-    month: "short",
+    month: "long",
     day: "numeric",
     year: "numeric"
   });
@@ -55,19 +55,24 @@ class ObservableContentStore {
     const cacheBust = force ? Date.now() : Math.floor(Date.now() / this.intervalMs);
     const separator = this.contentUrl.includes("?") ? "&" : "?";
     const requestUrl = `${this.contentUrl}${separator}v=${cacheBust}`;
-    const response = await fetch(requestUrl, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Failed to load content.json (${response.status})`);
-    }
+    try {
+      const response = await fetch(requestUrl, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`Failed to load content.json (${response.status})`);
+      }
 
-    const nextData = await response.json();
-    const nextSignature = JSON.stringify(nextData);
-    if (nextSignature !== this.signature) {
-      this.signature = nextSignature;
-      this.data = nextData;
-      this.notify();
+      const nextData = await response.json();
+      const nextSignature = JSON.stringify(nextData);
+      if (nextSignature !== this.signature) {
+        this.signature = nextSignature;
+        this.data = nextData;
+        this.notify();
+      }
+      return this.data;
+    } catch (e) {
+      console.warn("Using offline fallback if available", e);
+      return this.data; // Return stale data if fetch fails
     }
-    return this.data;
   }
 
   start() {
@@ -112,6 +117,7 @@ class BGM_Core {
     this.router = {
       home: () => this.renderHome(),
       latest: () => this.renderHome(),
+      watch: () => this.renderHome(), // Alias for now
       article: (id) => this.renderArticle(id)
     };
 
@@ -136,7 +142,10 @@ class BGM_Core {
     this.state.content = content;
     this.state.articlesById = new Map((content.articles || []).map((article) => [article.id, article]));
     this.renderNavigation();
-    this.handleRouteChange();
+    if (!this.state.isNavigating) {
+      // Re-render current route if we aren't mid-transition
+      this.renderRoute(this.state.currentRoute);
+    }
   }
 
   parseHashRoute() {
@@ -145,7 +154,7 @@ class BGM_Core {
   }
 
   normalizeRoute(routeCandidate) {
-    if (routeCandidate === "home" || routeCandidate === "latest") {
+    if (["home", "latest", "watch"].includes(routeCandidate)) {
       return routeCandidate;
     }
     if (this.state.articlesById.has(routeCandidate)) {
@@ -195,13 +204,7 @@ class BGM_Core {
   }
 
   renderNavigation() {
-    const navItems =
-      this.state.content?.navigation?.primary ||
-      [
-        { id: "home", label: "Home", href: "#home" },
-        { id: "latest", label: "Latest", href: "#latest" }
-      ];
-
+    const navItems = this.state.content?.navigation?.primary || [];
     this.nav.innerHTML = navItems
       .map(
         (item) => `
@@ -215,22 +218,23 @@ class BGM_Core {
   }
 
   renderRoute(route) {
-    if (!this.state.content || this.state.isNavigating) {
-      return;
-    }
+    if (!this.state.content) return;
+
+    // Prevent redundant rendering if simply validating hash
+    // (though in this simple router, re-rendering is safe/idempotent)
 
     this.state.currentRoute = route;
     this.paintActiveNav(route);
     this.options.onRouteChange(route);
 
     const routeRenderer = () => {
-      if (route === "home" || route === "latest") {
+      if (["home", "latest", "watch"].includes(route)) {
         this.routeTitle.textContent = "Editorial Theater";
         this.renderHome(route);
       } else {
         const article = this.state.articlesById.get(route);
         this.routeTitle.textContent = article?.kicker || "Featured";
-        this.router.article(route);
+        this.renderArticle(route);
       }
     };
 
@@ -258,7 +262,9 @@ class BGM_Core {
   }
 
   paintActiveNav(route) {
-    const activeRoute = route === "latest" ? "latest" : route === "home" ? "home" : null;
+    // Map specific article routes back to 'home' or 'latest' if needed, though for now simple matching
+    // For this UI, article view might not highlight any bottom nav, which is fine
+    const activeRoute = ["home", "latest", "watch"].includes(route) ? route : null;
     for (const button of this.nav.querySelectorAll(".nav-pill")) {
       const isActive = button.getAttribute("data-route") === activeRoute;
       button.classList.toggle("is-active", isActive);
@@ -268,72 +274,89 @@ class BGM_Core {
   renderHome(route = "home") {
     const content = this.state.content || {};
     const featuredIds = content.home?.featured || [];
-    const feedItems = content.home?.feed || [];
-    const featuredId = route === "latest" ? feedItems[0]?.articleId : featuredIds[0] || feedItems[0]?.articleId;
+
+    // Pick featured article
+    const featuredId = featuredIds[0];
     const featuredArticle = this.state.articlesById.get(featuredId);
 
-    if (!featuredArticle) {
-      this.mount.innerHTML = `
-        <section class="home-grid">
-          <article class="card feature-card">
-            <div class="feature-copy">
-              <h2>No featured story available</h2>
-              <p>Update <code>content.json</code> from BGMstudio Control Room to publish an entry.</p>
+    // Build Hero
+    let heroHtml = "";
+    if (featuredArticle) {
+      const transitionName = `hero-${featuredArticle.id}`;
+      const heroSrc = featuredArticle.hero?.image?.src || "";
+
+      heroHtml = `
+          <div class="hero-section">
+            <div class="hero-frame" data-route-link="${escapeHTML(featuredArticle.id)}">
+                <img
+                    class="hero-media"
+                    src="${escapeHTML(heroSrc)}"
+                    alt="${escapeHTML(featuredArticle.title)}"
+                    style="view-transition-name: ${transitionName}"
+                >
+                <div class="hero-overlay">
+                     <div class="chip-row">
+                        <span class="chip">${escapeHTML(featuredArticle.kicker || "Featured")}</span>
+                        <span class="chip">${featuredArticle.readingMinutes} min</span>
+                     </div>
+                     <h2 style="font-size: 1.8rem; margin: 0; line-height: 1.1;">${escapeHTML(featuredArticle.title)}</h2>
+                     <p style="color: var(--text-muted); margin-top: 8px;">${escapeHTML(featuredArticle.dek)}</p>
+                </div>
             </div>
-          </article>
-        </section>
-      `;
-      return;
+          </div>
+        `;
     }
 
-    const transitionName = `hero-${featuredArticle.id.replace(/[^a-z0-9-]/gi, "")}`;
-    const heroSrc = featuredArticle.hero?.image?.src || "";
-    const heroAlt = featuredArticle.hero?.image?.alt || featuredArticle.title;
-    const readingMinutes = Number(featuredArticle.readingMinutes) || 5;
-    const feedCards = feedItems
-      .map((item) => this.state.articlesById.get(item.articleId))
-      .filter(Boolean)
-      .map(
-        (article) => `
-          <article class="card">
-            <div class="feature-copy">
-              <div class="chip-row">
-                <span class="chip">${escapeHTML(article.kicker || "Coverage")}</span>
-                <span class="chip">${escapeHTML(String(article.readingMinutes || 4))} min</span>
-              </div>
-              <h2>${escapeHTML(article.title)}</h2>
-              <p>${escapeHTML(article.dek || "")}</p>
-              <button class="nav-pill" data-route-link="${escapeHTML(article.id)}">Open Story</button>
-            </div>
-          </article>
-        `
-      )
-      .join("");
+    // Build Rails
+    const railsConfig = content.home?.rails || [];
+    const railsHtml = railsConfig.map(rail => this.renderRail(rail)).join("");
 
     this.mount.innerHTML = `
       <section class="home-grid">
-        <article class="card feature-card">
-          <button class="hero-frame" data-route-link="${escapeHTML(featuredArticle.id)}">
-            <img
-              class="hero-media"
-              src="${escapeHTML(heroSrc)}"
-              alt="${escapeHTML(heroAlt)}"
-              loading="lazy"
-              style="view-transition-name: ${transitionName};"
-            >
-          </button>
-          <div class="feature-copy">
-            <div class="chip-row">
-              <span class="chip">${escapeHTML(featuredArticle.kicker || "Featured")}</span>
-              <span class="chip">${readingMinutes} min</span>
-            </div>
-            <h2>${escapeHTML(featuredArticle.title)}</h2>
-            <p>${escapeHTML(featuredArticle.dek || "")}</p>
-          </div>
-        </article>
-        ${feedCards}
+        ${heroHtml}
+        ${railsHtml}
       </section>
     `;
+  }
+
+  renderRail(railConfig) {
+    const items = railConfig.items || [];
+    const articles = items.map(id => this.state.articlesById.get(id)).filter(Boolean);
+
+    if (articles.length === 0) return "";
+
+    const cardTypeClass = railConfig.type === "videos" ? "card-video" :
+      railConfig.type === "clips" ? "card-poster" : "card-standard";
+
+    const cardsHtml = articles.map(article => {
+      const heroSrc = article.hero?.image?.src || "";
+
+      return `
+            <div class="rail-card ${cardTypeClass}" data-route-link="${escapeHTML(article.id)}">
+                <img class="card-media" src="${escapeHTML(heroSrc)}" loading="lazy" alt="">
+                <div class="card-content">
+                    <h3 class="card-title">${escapeHTML(article.title)}</h3>
+                    <div class="card-meta">
+                        <span>${escapeHTML(article.kicker || "Story")}</span>
+                        ${railConfig.type === 'videos' && article.duration ?
+          `• <span>${escapeHTML(article.duration)}</span>` :
+          `• <span>${article.readingMinutes} min</span>`}
+                    </div>
+                </div>
+            </div>
+          `;
+    }).join("");
+
+    return `
+        <div class="rail-section">
+            <div class="rail-header">
+                ${escapeHTML(railConfig.title)}
+            </div>
+            <div class="rail-container">
+                ${cardsHtml}
+            </div>
+        </div>
+      `;
   }
 
   renderArticle(id) {
@@ -344,10 +367,10 @@ class BGM_Core {
     }
 
     const widgetsById = new Map((article.widgets || []).map((widget) => [widget.id, widget]));
-    const transitionName = `hero-${article.id.replace(/[^a-z0-9-]/gi, "")}`;
+    const transitionName = `hero-${article.id}`;
     const heroSrc = article.hero?.image?.src || "";
-    const heroAlt = article.hero?.image?.alt || article.title;
 
+    // Render Blocks
     const blocksHtml = (article.blocks || [])
       .map((block) => {
         if (block.type === "paragraph") {
@@ -359,14 +382,10 @@ class BGM_Core {
         }
         if (block.type === "widget") {
           const widget = widgetsById.get(block.widgetRef);
-          if (!widget) {
-            return "";
-          }
-          const widgetPayload =
-            widget.data ||
-            article.widget_data?.[widget.dataRef || ""] || {
-              label: "Missing widget payload"
-            };
+          if (!widget) return "";
+
+          const widgetPayload = widget.data || article.widget_data?.[widget.dataRef || ""] || { label: "Missing Data" };
+
           return `
             <section class="widget-slot" data-widget="${escapeHTML(widget.type)}">
               ${this.renderWidget(widget.type, widgetPayload)}
@@ -375,14 +394,14 @@ class BGM_Core {
         }
         if (block.type === "image") {
           return `
-            <figure class="widget-slot">
+            <figure class="widget-slot" style="padding:0; overflow:hidden; border:none;">
               <img
-                class="hero-media"
                 src="${escapeHTML(block.src || "")}"
                 alt="${escapeHTML(block.alt || "")}"
-                loading="${escapeHTML(block.loading || "lazy")}"
+                style="width:100%; display:block;"
+                loading="lazy"
               >
-              <figcaption class="widget-title">${escapeHTML(block.caption || "")}</figcaption>
+              ${block.caption ? `<figcaption class="widget-title" style="padding:12px;">${escapeHTML(block.caption)}</figcaption>` : ""}
             </figure>
           `;
         }
@@ -391,36 +410,40 @@ class BGM_Core {
       .join("");
 
     this.mount.innerHTML = `
-      <article class="article-shell card">
-        <div class="hero-frame">
-          <img
-            class="hero-media"
-            src="${escapeHTML(heroSrc)}"
-            alt="${escapeHTML(heroAlt)}"
-            loading="lazy"
-            style="view-transition-name: ${transitionName};"
-          >
+      <article class="article-shell">
+        <div class="article-hero">
+            <img
+                class="hero-media"
+                src="${escapeHTML(heroSrc)}"
+                alt="${escapeHTML(article.title)}"
+                style="view-transition-name: ${transitionName}"
+            >
         </div>
-        <div class="article-meta">
-          <div class="chip-row">
-            <span class="chip">${escapeHTML(article.kicker || "Featured")}</span>
-            <span class="chip">${escapeHTML(formatDate(article.publishedAt))}</span>
-          </div>
-          <h2>${escapeHTML(article.title)}</h2>
-          <p>${escapeHTML(article.dek || "")}</p>
+        
+        <div class="article-header">
+             <div class="chip-row">
+                <span class="chip">${escapeHTML(article.kicker || "Featured")}</span>
+                <span class="chip">${formatDate(article.publishedAt)}</span>
+             </div>
+             <h1 class="article-title">${escapeHTML(article.title)}</h1>
+             <p class="article-dek">${escapeHTML(article.dek || "")}</p>
         </div>
-        <section class="article-content">
-          ${blocksHtml}
-        </section>
+
+        <div class="article-body">
+            ${blocksHtml}
+        </div>
       </article>
     `;
+
+    // Scroll to top of article
+    this.mount.closest('.route-shell').scrollTop = 0;
   }
 
   renderWidget(type, data) {
     const renderer = this.widgetRegistry.get(type);
     if (!renderer) {
       return `
-        <span class="widget-title">Unsupported widget: ${escapeHTML(type)}</span>
+        <span class="widget-title">Unsupported: ${escapeHTML(type)}</span>
         <span class="widget-placeholder"></span>
       `;
     }
@@ -444,11 +467,12 @@ class BGM_Core {
     return `
       <span class="widget-title">${escapeHTML(data.label || "Sparkline")}</span>
       <span class="widget-placeholder">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style="overflow:visible">
           <polyline
             fill="none"
             stroke="${escapeHTML(data.color || "#D4AF37")}"
-            stroke-width="2.5"
+            stroke-width="2"
+            vector-effect="non-scaling-stroke"
             points="${polyline}"
           ></polyline>
         </svg>
@@ -464,8 +488,11 @@ class BGM_Core {
     );
     const bars = riskScale
       .map((label, index) => {
-        const strength = index <= activeIndex ? 0.85 : 0.2;
-        return `<rect x="${index * 25}" y="${20 + index * 6}" width="18" height="${65 - index * 6}" fill="rgba(212,175,55,${strength})"></rect>`;
+        const isActive = index <= activeIndex;
+        const opacity = isActive ? 0.9 : 0.15;
+        // Simple heatmap gradient logic
+        const hue = 60 - (index * 20); // Yellow to Red-ish
+        return `<rect x="${index * 25}" y="${isActive ? 20 : 40}" width="20" height="${isActive ? 60 : 40}" rx="4" fill="hsla(${hue}, 80%, 50%, ${opacity})"></rect>`;
       })
       .join("");
 
